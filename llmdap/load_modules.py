@@ -1,7 +1,7 @@
-import outlines
+#import outlines
 import openai
 import importlib
-import torch
+#import torch
 
 import dataset_loader
 import metadata_schemas 
@@ -9,8 +9,8 @@ import form_filling
 #import evaluation
 import context_shortening
 
-import nltk
-nltk.download('averaged_perceptron_tagger_eng')
+#import nltk
+#nltk.download('averaged_perceptron_tagger_eng')
 
 
 def set_openai_api_key():

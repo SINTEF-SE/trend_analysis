@@ -94,8 +94,8 @@ def call_inference(
         outputs[key] =ff_iterator.fill_single_form(key=key, paper_text=paper_text, pydantic_form=schema, return_dict_with_context=return_dict_with_context)
 
         # uncomment for quick testing
-        if len(outputs)>2: 
-            break
+        #if len(outputs)>2: 
+        #    break
 
     return outputs
 
@@ -157,11 +157,11 @@ if __name__ == "__main__":
 
     C = Call_trend_run()
 
-    C.load_data(1)#30)
+    C.load_data(30)
     datasets = [C.hf, C.arx, C.nls]
     C.call_run(datasets)
 
-    #C.load_old_data(30)
-    #datasets = [C.old_arx, C.old_nls]
-    #C.call_run(datasets)
+    C.load_old_data(30)
+    datasets = [C.old_arx, C.old_nls]
+    C.call_run(datasets)
 
