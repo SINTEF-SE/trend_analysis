@@ -1,0 +1,502 @@
+AI Taxonomy:
+  Model architecture: 
+    Not relevant: 
+    Classical machine learning models: 
+      - Linear regression
+      - Logistic regression
+      - Decision trees
+      - Random forests
+      - Gradient boosting
+      - Support vector machines
+    
+    Neural/deep learning architectures: 
+      Feed-forward networks: 
+        - Multilayer perceptrons
+        - Autoencoders
+      
+      Convolutional networks: 
+        - 2D CNNs
+        - 3D CNNs
+        - Convolutional autoencoders
+        - CNN-based GANs
+        - Diffusion UNets
+      
+      Sequence models: 
+        Recurrent neural networks: 
+          - Vanilla RNN
+          - Long short-term memory (LSTM)
+          - Gated recurrent unit (GRU)
+        
+        Transformer architectures: 
+          Encoder-decoder transformers: 
+          Decoder-only transformers: 
+          Encoder-only transformers: 
+            - BERT
+            - Vision transformers
+            - Audio encoders
+            
+          Sparse attention transformers: 
+            - Long-context transformers
+            - Low-rank / structured attention
+          
+          Mixture-of-experts transformers: 
+          Multimodal transformers: 
+            - Vision-language transformers
+            - Speech-text transformers
+            - Video-text transformers
+          
+          Variational transformers:
+          Diffusion transformers:
+          Adversarial transformers:
+        
+        Temporal CNNs:
+        State-space models:
+      
+      Graph and relational: 
+        - Graph neural networks
+        - Graph transformers
+        - Relational reasoning networks
+        - Graph diffusion models
+        - Graph VAEs
+        - Graph GANs
+      
+      Physics-inspired and continuous models: 
+        - Neural ODEs
+        - Hamiltonian neural networks
+        - Physics-informed neural networks
+      
+      Neuro-symbolic models: 
+        - Neural-symbolic systems
+        - Differentiable logic layers
+      
+    
+  
+  AI problem type: 
+    Not relevant: 
+    Natural language processing: 
+      - Question answering
+      - Information extraction
+      - Semantic parsing
+      - Commonsense reasoning
+      - Machine translation
+      - Summarization
+      - Dialogue systems
+      - Human-AI co-writing
+      - Knowledge graph construction
+      - Grounded language understanding
+      - Information retrieval and search
+      - Retrieval-augmented generation
+    
+    Speech and audio: 
+      - Speech recognition
+      - Speech synthesis
+      - Speaker diarization
+      - Audio event detection
+      - Music understanding
+      - Audio/music generation
+    
+    Computer vision: 
+      - Image classification
+      - Video classification
+      - Object detection
+      - Segmentation
+      - Pose estimation
+      - Tracking
+      - 3D reconstruction
+      - Scene understanding
+      - Simultaneous localization and mapping
+      - Text-to-image generation
+      - Image-to-image translation
+      - Video generation
+      - Neural rendering
+    
+    Multimodal: 
+      - Vision-language understanding
+      - Audio-visual learning
+      - Cross-modal retrieval
+      - Multimodal generation
+    
+    Recommendation and personalization: 
+      - Recommender systems
+      - Learning-to-rank
+      - Contextual bandits for recommendations
+    
+    Time-series and forecasting: 
+      - Forecasting
+      - Anomaly detection
+      - Event prediction
+      - Demand and energy forecasting
+      - Financial forecasting
+    
+    Graph and relational: 
+      - Node/edge/graph prediction
+      - Link prediction
+      - Community detection
+      - Graph clustering
+    
+    Decision-making and control: 
+      - Planning and scheduling
+      - Robot manipulation
+      - Autonomous navigation
+      - Human-robot interaction
+      - Sim-to-real transfer
+      - Multi-agent decision-making
+      - Safe and robust control
+    
+    Structured and tabular: 
+      - Classification
+      - Regression
+      - Survival analysis
+      - Risk scoring
+    
+  
+  Learning paradigm: 
+    Not relevant: 
+    Supervised learning: 
+      Classification: 
+        - Binary classification
+        - Multi-class classification
+        - Multi-label classification
+        - Hierarchical classification
+      
+      Regression: 
+        - Single-output regression
+        - Multi-output regression
+        - Ordinal regression
+      
+      Ranking:
+      Structured prediction:
+      Sequence labeling:
+      Imbalanced learning:
+      Cost-sensitive learning:
+    
+    Unsupervised learning: 
+      - Contrastive learning
+      - Masked modeling
+      - Representation learning
+    
+    Self-supervised learning: 
+      - Clustering
+      - Density estimation
+      - Dimensionality reduction
+    
+    Few-shot and generalization: 
+      - Few-shot learning
+      - Zero-shot learning
+      - Prompt-based adaptation
+      - Meta-learning
+    
+    Model adaptation / fine-tuning: 
+      Full-parameter fine-tuning:
+      Task-specific fine-tuning:
+      Domain adaptation fine-tuning:
+      Continual fine-tuning:
+      Parameter-efficient tuning: 
+        - Adapter-based tuning
+        - Low-rank adaptation (LoRA)
+        - Prefix / prompt tuning
+        - BitFit and bias-only tuning
+      
+      Knowledge distillation: 
+    
+    Reinforcement learning: 
+      - Model-based RL
+      - Model-free RL
+      - Offline RL
+      - Multi-agent RL
+      - Exploration strategies
+      - Safe RL
+    
+    Human feedback and alignment: 
+      - Reinforcement learning from human feedback
+      - Constitutional AI
+      - Preference modeling
+      - Instruction tuning
+    
+    Collaborative and secure: 
+      - Federated learning
+      - Differential privacy in ML
+      - Secure multi-party learning
+      - Continual and lifelong learning
+    
+    Training regimes: 
+      - Curriculum learning
+      - Self-paced learning
+      - Hard example mining
+    
+    Meta-ML and model selection: 
+      - Hyperparameter optimization
+      - AutoML (pipeline/search)
+      - Neural architecture search
+    
+
+  
+  Application domain: 
+    Not relevant: 
+    General-purpose AI products: 
+      Assistants and chat: 
+        Chatbots: 
+          - Open-domain/social chatbots
+          - Task-oriented/transactional chatbots
+          - Customer service chatbots
+          - Domain-specific chatbots
+          - Entertainment/roleplay chatbots
+          - Research-oriented chatbots
+        
+        Customer support assistants:
+        Search assistants:
+        Personal assistants:
+        Knowledge management assistants:
+        General-purpose computer-use agents: 
+          - Browser automation agents
+          - Desktop automation agents
+          - Enterprise RPA-style agents
+          - Developer/technical automation agents
+          - Multi-app orchestration agents
+          - Autonomous task loop agents
+        
+      
+      Productivity and office: 
+        - Document summarization tools
+        - Meeting assistants
+        - Email drafting
+        - Note-taking and transcription
+        - Presentation/slide generation
+      
+      Developer and coding tools: 
+        - Code completion
+        - Code explanation and refactoring
+        - Bug detection
+        - Test generation
+        - SQL/query assistants
+      
+      Creative tools: 
+        - Image generation
+        - Video generation
+        - Music generation
+        - Story/poetry writing
+        - Design and prototyping
+      
+      Search and retrieval: 
+        - Enterprise search
+        - Semantic search
+        - RAG-based assistants
+      
+      Analytics and decision support: 
+        - Data analysis copilots
+        - Business intelligence augmentation
+        - Forecasting dashboards
+        - Simulation and scenario planning
+      
+    
+    Industry-specific applications: 
+      Healthcare and life sciences: 
+        Healthcare: 
+          - Clinical care and hospital operations
+          - Medical imaging
+          - Electronic health records
+          - Public health and epidemiology
+        
+        Life sciences: 
+          - Drug discovery
+          - Biotechnology
+          - Genomics and proteomics
+        
+      
+    
+      Finance, business and legal: 
+        Finance and fintech: 
+          - Banking and payments
+          - Insurance
+          - Investment and trading
+          - Risk and compliance
+        
+        Legal and compliance: 
+          - Legal practice
+          - E-discovery
+          - Contract management
+          - Regulatory compliance
+        
+        Business operations: 
+          - Human resources
+          - Marketing and advertising
+          - Customer service
+        
+      
+    
+      Industry, manufacturing and infrastructure: 
+        Manufacturing: 
+          - Automotive
+          - Electronics and hardware production
+          - Chemicals and materials
+          - Process industries
+        
+        Energy: 
+          Oil and gas: 
+          Electricity: 
+            Production: 
+              - Fossil
+              - Nuclear
+              - Solar
+              - Wind
+              - Hydro
+            
+            Grid and distribution: 
+          
+        
+        Construction and real estate: 
+          - Architecture and design
+          - Building operations
+          - Real estate management
+        
+        Transportation and logistics: 
+          - Shipping and freight
+          - Aviation
+          - Rail
+          - Autonomous vehicles
+        
+        Data centers and cloud computing: 
+          - Hyperscale cloud
+          - Enterprise IT
+          - Edge computing
+        
+      
+    
+      Media, education and culture: 
+        Media and entertainment: 
+          - Film and video
+          - Music
+          - Publishing
+          - Games
+        
+        Education: 
+          - Schools and universities
+          - Online learning
+          - Tutoring and assessment
+        
+        Culture and creative industries: 
+          - Art and design
+          - Fashion
+          - Heritage and museums
+        
+      
+    
+      Technology platforms and ecosystems: 
+        AI and data platforms: 
+          - Foundation model providers
+          - Model hosting and inference platforms
+          - Vector databases and embeddings providers
+          - MLOps and LLMOps platforms
+          - Prompt/agent frameworks
+          - Evaluation and observability
+          - Synthetic data and labeling platforms
+          - Feature stores and data platforms
+        
+        Open source ecosystems: 
+          - Model hubs and communities
+          - Open model projects
+          - Tooling and libraries
+          - Open research resources
+        
+        Telecommunications: 
+          - Network infrastructure
+          - Mobile operators
+          - Satellite communications
+        
+        Mobile devices and ecosystems: 
+          - Smartphones
+          - Wearables
+          - IoT devices
+        
+        Operating systems and platforms: 
+          - Desktop OS
+          - Mobile OS
+          - Cloud platforms
+        
+      
+    
+      Public sector, defense and security: 
+        Government: 
+          - Citizen services
+          - Administration
+          - Smart cities
+        
+        Defense and aerospace: 
+          - Military systems
+          - Space exploration
+          - Aerospace engineering
+        
+        Cybersecurity: 
+          - Threat detection
+          - Incident response
+          - Infrastructure protection
+        
+      
+    
+      Agriculture and environment: 
+        Agriculture: 
+          - Crop production
+          - Livestock
+          - Precision agriculture
+        
+        Environment and sustainability: 
+          - Climate science
+          - Conservation
+          - Sustainable resource management
+
+    AI infrastructure and tooling:
+      Machine learning operations MLOps:
+        - Experiment tracking
+        - Model versioning and registry
+        - Deployment and serving
+        - Production monitoring (latency, errors, SLOs)
+        - Canary/blue-green rollouts
+        - Incident response and alerting
+        - Drift detection and automated retraining
+    
+      Data engineering and pipelines:
+        - Data collection and labeling
+        - Data validation and quality monitoring
+        - Feature stores and data versioning
+    
+      Evaluation and observability:
+        - Offline evaluation and benchmarks
+        - Behavioral/unit tests for prompts and agents
+        - Online evaluation (A/B tests, interleaving)
+        - Tracing and telemetry (requests, tokens, costs)
+        - Performance dashboards and analytics
+    
+      Infrastructure and scaling:
+        - Distributed training
+        - Inference optimization
+        - Resource scheduling and autoscaling
+        - Cloud and edge deployment
+    
+      Developer frameworks and runtimes:
+        - ML libraries and frameworks
+        - Prompt/agent orchestration frameworks
+        - Simulation and sandbox environments
+        - API and SDK toolkits
+    
+      Safety and policy:
+        - Policy enforcement and guardrails
+        - Safety evaluation and red-teaming
+        - Content moderation
+        - Prompt injection and jailbreak defenses
+        - Toxicity and bias filtering
+        - PII filtering and data loss prevention
+    
+      Governance and compliance:
+        - Model and data provenance/watermarking
+        - Audit logging and traceability
+        - Access control and approval workflows
+        - Risk and compliance assessments (GDPR, HIPAA, etc.)
+        - Privacy-preserving inference (differential privacy, MPC)
+        - Model documentation and reporting (model cards, system cards)
+
+        
+      
+    
+  
+
+

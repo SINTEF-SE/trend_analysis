@@ -1,0 +1,5 @@
+streamlit
+plotly
+pydantic>=2,<3
+pandas
+pyyaml

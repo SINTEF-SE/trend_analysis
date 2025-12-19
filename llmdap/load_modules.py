@@ -1,0 +1,296 @@
+import outlines
+import openai
+import importlib
+import torch
+
+import dataset_loader
+import metadata_schemas 
+import form_filling
+#import evaluation
+import context_shortening
+
+import nltk
+nltk.download('averaged_perceptron_tagger_eng')
+
+
+def set_openai_api_key():
+    from openai_key import API_KEY
+    openai.api_key = API_KEY
+
+
+def remove_non_single_fields(labels):
+    return [field for field in labels.keys() if len(labels[field]) != 1]
+
+def remove_empty_fields(labels):
+    return [field for field in labels.keys() if len(labels[field]) == 0]
+
+
+def load_modules(args, preloaded_outlines_model = None, preloaded_dataset = None, inference_schema = None, graph_traversers =None, traversal_problem_type=None):
+    """
+    prepare arguments, then call fill_out_forms 
+    preloaded_outlines_model can be inputted to avoid loading it in memory several times
+    inference_schema : for running inference, schema is provided here instead of through dataset.
+    adaptive_schema : for traversal, use one adaptive schema for each step, and use inference schema for field for full prediction.
+    """
+
+    # load llm
+    model_is_openai = False
+    use_best_choice_generator = False
+    if args.ff_model == "4om": # openai model
+        model_id = "gpt-4o-mini"
+        model_is_openai = True
+    elif args.ff_model == "4o": # openai model
+        model_id = "gpt-4o"
+        model_is_openai = True
+    elif args.ff_model == "5m": # openai model
+        model_id = "gpt-5-mini"
+        model_is_openai = True
+    elif args.ff_model == "5n": # openai model
+        model_id = "gpt-5-nano"
+        model_is_openai = True
+    elif args.ff_model == "41m": # openai model
+        model_id = "gpt-4.1-mini"
+        model_is_openai = True
+    elif args.ff_model == "41n": # openai model
+        model_id = "gpt-4.1-nano"
+        model_is_openai = True
+    elif args.ff_model == "best_choice":
+        use_best_choice_generator = True
+    elif args.ff_model == "None": # do not load any model (used for retrieval evaluation)
+        model_id = ""
+        model_is_openai = True
+    else: # huggingface model, with outlines
+        # load HF llm
+        if preloaded_outlines_model is None:
+            if args.ff_model == "llama3.1I-8b-q4":
+                model_id = "hugging-quants/Meta-Llama-3.1-8B-Instruct-GPTQ-INT4"
+            elif args.ff_model == "biolm":
+                model_id = "aaditya/Llama3-OpenBioLLM-8B"
+            elif args.ff_model == "ds8b-i4":
+                model_id = "jakiAJK/DeepSeek-R1-Distill-Llama-8B_GPTQ-int4"
+            else:
+                model_id = args.ff_model
+            outlines_llm = outlines.models.transformers(model_name=model_id, device = "cuda:2" if torch.cuda.device_count()>1 else "cuda:0")
+        else:
+            outlines_llm = preloaded_outlines_model
+
+        # define outlines llm and sampler
+        if args.sampler == "greedy":
+            outlines_sampler = outlines.samplers.GreedySampler()
+        elif args.sampler == "beam":
+            outlines_sampler = outlines.samplers.BeamSearchSampler(beams = args.sampler_beams)
+        elif args.sampler == "multi":
+            outlines_sampler = outlines.samplers.MultinomialSampler(
+                    top_k=args.sampler_top_k,
+                    top_p=args.sampler_top_k,
+                    temperature=args.sampler_temp,
+                    )
+        else:
+            raise ValueError
+
+    if model_is_openai:
+        set_openai_api_key()
+
+    if not inference_schema is None: # inference mode:
+        pydantic_form = inference_schema
+        dataset_kwargs = dict() # no need for a dataset, as the iteration functions of run_modules are not run in inference mode
+
+    elif args.dataset == "arxpr2" and args.dataset_shuffle == "r":
+        # do dynamic reloading+shuffling
+        length = args.dataset_literal_length
+        form_generator = metadata_schemas.get_shuffled_arxpr2(length = length)
+        document_generator = dataset_loader.Arxpr_generator(version = "2_25", mode=args.mode)
+        dataset_kwargs = dict(
+                form_generator = form_generator,
+                document_generator = document_generator,
+                )
+        pydantic_form = form_generator()
+    elif args.dataset == "arxpr3" and args.dataset_shuffle == "r":
+        # do dynamic reloading+shuffling
+        length = args.dataset_literal_length
+        form_generator = metadata_schemas.get_shuffled_arxpr2(length = length, v3=True)
+        document_generator = dataset_loader.Arxpr_generator(version = f"3_25_{args.fields_length}", mode=args.mode)
+        dataset_kwargs = dict(
+                form_generator = form_generator,
+                document_generator = document_generator,
+                )
+        pydantic_form = form_generator()
+    elif args.dataset == "study_type" and args.dataset_shuffle == "r":
+        # do dynamic reloading+shuffling
+        length = args.dataset_literal_length
+        form_generator = metadata_schemas.get_shuffled_arxpr2(length = length, only_shuffle_type = True)
+        document_generator = dataset_loader.Studytype_generator(version = "2_25", mode=args.mode)
+        dataset_kwargs = dict(
+                form_generator = form_generator,
+                document_generator = document_generator,
+                )
+        pydantic_form = form_generator(0)
+    else:
+        # load up front
+        loader_kwargs = {"max_amount": args.dataset_length}
+        if args.dataset == "arxpr":
+            loader = dataset_loader.load_arxpr_data
+            pydantic_form = metadata_schemas.arxpr_schema 
+        elif args.dataset == "arxpr2":
+            loader_kwargs["version"] = "2_25" # loaded dataset always 25, only pydantic form depends on literal_length and shuffling
+            if args.dataset_shuffle == "s": #preshuffled
+                raise NotImplementedError # just shiffle here instead
+                #pydantic_form = metadata_schemas.arxpr2s_schemas[str(args.dataset_literal_length)] # TODO shuffle
+            elif args.dataset_shuffle == "n": # not shuffled
+                pydantic_form = metadata_schemas.arxpr2_schemas[str(args.dataset_literal_length)]
+            elif args.dataset_shuffle.isdecimal(): #preshuffled
+                length = int(args.dataset_literal_length)
+                form_generator = metadata_schemas.get_shuffled_arxpr2(length = length)
+                pydantic_form = form_generator(seed=args.dataset_shuffle)
+            else:
+                print(type(args.dataset_shuffle), args.dataset_shuffle)
+                raise ValueError
+
+            loader_kwargs["mode"] = args.mode #train or test
+            loader = dataset_loader.load_arxpr_data
+        elif args.dataset == "study_type":
+            loader = dataset_loader.load_study_type_data
+            pydantic_form = metadata_schemas.study_type_schema 
+        elif args.dataset == "ega":
+            loader = dataset_loader.load_ega_data
+            pydantic_form = metadata_schemas.ega_schema
+        elif args.dataset == "nhrf":
+            loader = dataset_loader.load_nhrf_examples
+            pydantic_form = metadata_schemas.nhrf_qa_schema
+        elif args.dataset == "nhrf2":
+            loader = dataset_loader.load_nhrf_examples2
+            pydantic_form = metadata_schemas.nhrf_schema
+        elif args.dataset == "nhrf3":
+            loader = dataset_loader.load_nhrf_examples3
+            pydantic_form = metadata_schemas.nhrf_qa_schema_2
+        elif args.dataset == "simple_test":
+            loader = dataset_loader.get_simple_test
+            pydantic_form = metadata_schemas.arxpr_schema 
+        elif args.dataset == "arxiv_paper_abstracts":
+            loader = dataset_loader.load_arxiv_papers
+            pydantic_form = metadata_schemas.constr_100_schema # max length of preflabel in AI tax is 84
+        else:
+            raise ValueError
+        if preloaded_dataset is None:
+
+            all_documents, all_labels = loader(**loader_kwargs)
+        else:
+            all_documents, all_labels = preloaded_dataset
+
+        dataset_kwargs = dict(
+                documents = all_documents,
+                labels = all_labels,
+                )
+
+
+    # set context_shortener
+    if args.context_shortener == "rag":
+        context_shortener = context_shortening.RAGShortener(
+                embed_model = args.embedding_model,
+                pydantic_form = pydantic_form,
+                retriever_type = args.retriever_type,
+                chunk_size = args.chunk_size,
+                chunk_overlap = args.chunk_overlap,
+                similarity_k = args.similarity_k,
+                mmr_param = args.mmr_param,
+                )
+    elif args.context_shortener == "full_paper":
+        context_shortener = context_shortening.FullPaperShortener()
+    elif args.context_shortener == "retrieval":
+        if not args.dataset in ["study_type", "arxpr2", None, "arxpr3"]:
+            if not args.field_info_to_compare=="description":
+                if not args.dataset == "arxiv_paper_abstracts":
+                    raise ValueError
+
+        context_shortener = context_shortening.Retrieval(
+                chunk_info_to_compare = args.chunk_info_to_compare,
+                field_info_to_compare = args.field_info_to_compare,
+                include_choice_every = args.include_choice_every,
+                embedding_model_id = args.embedding_model,
+                pydantic_form = pydantic_form if args.include_choice_every==1 or args.dataset_shuffle!="r" else None, # if we are to reshufle and pick only some values, we do not specify the pydantic form here.
+                n_keywords = args.n_keywords,
+                top_k = args.similarity_k,
+                chunk_size = args.chunk_size,
+                chunk_overlap = args.chunk_overlap,
+                mmr_param = args.mmr_param,
+                maxsum_factor = args.maxsum_factor,
+                keyphrase_range = (args.keyphrase_min, args.keyphrase_min + args.keyphrase_range_diff),
+                )
+    else:
+        print(args.context_shortener)
+        raise ValueError
+
+
+    # set form_filler
+    if not graph_traversers is None:
+        assert not traversal_problem_type is None
+        if model_is_openai:
+            model_kwargs = dict(openai_model_id = model_id)
+            print("---------- using openai for graph traversal, with model=", model_id)
+        else:
+            model_kwargs = dict(
+                outlines_llm = outlines_llm,
+                outlines_sampler = outlines_sampler,
+                )
+        form_filler = form_filling.AdaptiveFormFiller(
+                **model_kwargs,
+                pydantic_form = pydantic_form,
+                graph_traversers = graph_traversers,
+                traversal_type = args.traversal_type,
+                traversal_max_steps = args.traversal_max_steps,
+                answer_in_quotes=args.answer_in_quotes,
+                max_tokens = args.outlines_ff_max_tokens,
+                problem_type=traversal_problem_type,
+                verbose=False)
+    elif model_is_openai:
+        if args.context_shortener=="full_paper":
+            form_filler = form_filling.OpenAIFormFiller(
+                    model_id=model_id,
+                    pydantic_form = pydantic_form,
+                    max_tokens = args.openai_ff_max_tokens,
+                    verbose=False)#True)
+        elif args.context_shortener in ["rag", "retrieval"]:
+            form_filler = form_filling.OpenAISequentialFormFiller(
+                    model_id=model_id,
+                    pydantic_form = pydantic_form,
+                    max_tokens = args.openai_ff_max_tokens,
+                    verbose=False)
+        else:
+            raise NotImplementedError
+    elif use_best_choice_generator:
+        form_filler = form_filling.DirectKeywordSimilarityFiller(
+                pydantic_form=pydantic_form,
+                verbose=False)
+
+    else:
+        # load llm form filler
+        form_filler = form_filling.SequentialFormFiller(
+                outlines_llm,
+                outlines_sampler,
+                pydantic_form=pydantic_form,
+                answer_in_quotes=args.answer_in_quotes,
+                max_tokens = args.outlines_ff_max_tokens)
+
+    # remove fields?
+    if args.remove_fields == "None":
+        remove_fields = lambda x:[]
+    elif args.remove_fields == "empty":
+        remove_fields = remove_empty_fields
+    elif args.remove_fields == "non-single":
+        remove_fields = remove_non_single_fields
+    else:
+        print(args.remove_fields)
+        raise ValueError
+
+
+
+    prepared_kwargs = dict(
+            context_shortener = context_shortener,
+            form_filler = form_filler,
+            #evaluation_fnc=evaluation.score_general_prediction,
+            remove_fields = remove_fields,
+            **dataset_kwargs
+            )
+    return prepared_kwargs
+
+
